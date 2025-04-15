@@ -2,8 +2,8 @@ import cv2
 import time
 from collections import Counter
 import easyocr
-import numpy as np
 from concurrent.futures import ThreadPoolExecutor
+import requests
 
 # Initialize OCR reader globally
 reader = easyocr.Reader(['en'], gpu=True)  
@@ -76,6 +76,12 @@ def print_detected_plates():
             if texts:
                 stable_plate = get_stable_text(track_id)
                 if stable_plate and stable_plate not in printed_plates:
+                    vehicle_data = {
+                        "vehicle_id": stable_plate , 
+                        "type":"CheckIn"
+                    }
+                    response = requests.post("http://localhost:9000/api/v1/vehicle/mark",json=vehicle_data)
+                    print(response.json())
                     print(f"🚗 Detected License Plate: {stable_plate}")
                     printed_plates.add(stable_plate)
 
